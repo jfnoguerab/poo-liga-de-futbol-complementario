@@ -21,8 +21,8 @@ public class Application {
             Equipo eq3 = new Equipo("Bulls");
 
             Jugador jug1 = new Jugador("John Smith", eq1);
-            Jugador jug2 = new Jugador("Sara Smith", eq2);
-            Jugador jug3 = new Jugador("Juan Perez", eq3);
+            Jugador jug2 = new Jugador("Sara Smith", eq1);
+            Jugador jug3 = new Jugador("Juan Perez", eq1);
 
             // Asignamos los valores
             equiposArr[0] = eq1;
@@ -116,7 +116,7 @@ public class Application {
         MenuUtility.header("Crear jugador");
 
         if (Equipo.isEmpty()) {
-            System.out.println("Lo sentimos, debe tener equipos registrados para crear jugadores.");
+            System.out.println("Lo sentimos, debe tener equipos registrados para crear un jugador.");
 
             // Pausar la ejecución del programa hasta que presione ENTER
             ConsoleUtility.waitPressEnterKey(scanner);
@@ -129,7 +129,8 @@ public class Application {
 
         // Listamos los equipos registrados
         System.out.println("\nEquipos disponibles:");
-        Equipo.printAllEquipos(equiposArr, "");
+        Equipo.printListEquipos(equiposArr, "");
+
         // Solicitamos la selección del equipo a asignar
         int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
 
@@ -185,7 +186,7 @@ public class Application {
 
         System.out.println("\nLista de jugadores:");
 
-        Jugador.printAllJugadores(jugadoresArr, "");
+        Jugador.printListJugadores(jugadoresArr, "");
 
         // Solicitamos la selección del jugador a asignar
         int indiceJugador = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del jugador correspondiente: ", 1, jugadoresArr.length);
@@ -193,7 +194,7 @@ public class Application {
         
         System.out.println("\nLista de equipos:");
 
-        Equipo.printAllEquipos(equiposArr, "");
+        Equipo.printListEquipos(equiposArr, "");
 
         // Solicitamos la selección del equipo a asignar
         int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
@@ -236,8 +237,8 @@ public class Application {
         } else {
             System.out.println("\nLista de jugadores:");
 
-            Jugador.printAllJugadores(jugadoresArr, "");
-
+            Jugador.printListJugadores(jugadoresArr, "");
+            
             // Solicitamos la selección del jugador a asignar
             int indiceJugador = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del jugador correspondiente: ", 1, jugadoresArr.length);
 
@@ -267,7 +268,7 @@ public class Application {
         } else {
             System.out.println("\nLista de equipos:");
 
-            Equipo.printAllEquipos(equiposArr, "");
+            Equipo.printListEquipos(equiposArr, "");
 
             // Solicitamos la selección del equipo a asignar
             int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
@@ -281,8 +282,12 @@ public class Application {
             if (clearFilters == 'S') {
                 equiposArr = Equipo.eliminarEquipo(equiposArr, delEquipo);
 
-                // Eliminamos las relaciones del equipo con lo jugadores
-                Jugador.clearRelationshipWithEquipo(jugadoresArr, delEquipo);
+                // Eliminamos los jugadores relacionados al equipo
+                // Obtenemos un listado de los Ids de los jugadores asociados al equipo
+                Integer[] listIdsJugadores = Jugador.getIdsJugadoresRelatedToEquipo(jugadoresArr, delEquipo);
+                if (listIdsJugadores != null) {
+                    jugadoresArr = Jugador.eliminarJugador(jugadoresArr, listIdsJugadores);
+                }
 
                 System.out.println("\nEl equipo se eliminó exitosamente.");
             }
@@ -415,6 +420,15 @@ public class Application {
     private static void cambiarEquipo(int indice, Jugador jugador) {
         MenuUtility.header("Cambiar equipo del jugador "+ jugador.getNombre());
 
+        if (Equipo.isEmpty()) {
+            System.out.println("No hay equipos registrados.");
+
+            // Pausar la ejecución del programa hasta que presione ENTER
+            ConsoleUtility.waitPressEnterKey(scanner);
+
+            return;
+        }
+
         System.out.println("\nLista de equipos:");
 
         Equipo.printAllEquipos(equiposArr, "");
@@ -502,6 +516,15 @@ public class Application {
 
     private static void agregarJugador(Equipo equipo) {
         MenuUtility.header("Agregar jugador al equipo "+ equipo.getNombre());
+
+        if (Jugador.isEmpty()) {
+            System.out.println("No hay jugadores registrados.");
+
+            // Pausar la ejecución del programa hasta que presione ENTER
+            ConsoleUtility.waitPressEnterKey(scanner);
+
+            return;
+        }
 
         System.out.println("\nLista de jugadores:");
 
