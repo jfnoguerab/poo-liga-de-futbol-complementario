@@ -16,8 +16,9 @@ public class Jugador {
 
     public Jugador(){}
 
-    public Jugador(String nombre) {
+    public Jugador(String nombre, Equipo equipo) {
         this.setNombre(nombre);
+        this.setEquipo(equipo);
         cont++;
         this.id = cont;
     }
