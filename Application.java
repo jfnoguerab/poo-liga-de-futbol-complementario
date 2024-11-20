@@ -21,8 +21,8 @@ public class Application {
             Equipo eq3 = new Equipo("Bulls");
 
             Jugador jug1 = new Jugador("John Smith", eq1);
-            Jugador jug2 = new Jugador("Sara Smith", eq1);
-            Jugador jug3 = new Jugador("Juan Perez", eq1);
+            Jugador jug2 = new Jugador("Sara Smith", eq2);
+            Jugador jug3 = new Jugador("Juan Perez", eq3);
 
             // Asignamos los valores
             equiposArr[0] = eq1;
