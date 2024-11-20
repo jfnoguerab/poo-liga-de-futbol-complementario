@@ -50,6 +50,18 @@ Para continuar con el sistema de gestión de la liga de fútbol es necesario agr
 
     5. **Regresar al menú principal.**
 
+---
+
+### Actividad: Ejercicio complementario
+
+
+#### Aplicando una relación de composición
+
+Utiliza el ejercicio anterior pero ahora crea un proyecto nuevo donde la lógica sea una relación de composición:
+
+* No debes dejar que se pueda crear un Jugador si no hay equipos disponibles.
+
+* Cuando eliminas un equipo debes eliminar también los jugadores que pertenezcan a ese equipo. Pero la relación inversa no se cumple, es decir, si eliminas un jugador no debes eliminar al equipo al que pertenece.
 
 ---
 
