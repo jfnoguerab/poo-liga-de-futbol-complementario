@@ -16,18 +16,13 @@ public class Application {
         try {
 
             // Definimos unos valores por defecto
-            Equipo eq1 = new Equipo("warriors");
+            Equipo eq1 = new Equipo("Warriors");
             Equipo eq2 = new Equipo("Celtics");
             Equipo eq3 = new Equipo("Bulls");
 
-            Jugador jug1 = new Jugador("John Smith");
-            jug1.setEquipo(eq1);
-            
-            Jugador jug2 = new Jugador("Sara Smith");
-            jug2.setEquipo(eq2);
-            
-            Jugador jug3 = new Jugador("Juan Perez");
-            jug3.setEquipo(eq3);
+            Jugador jug1 = new Jugador("John Smith", eq1);
+            Jugador jug2 = new Jugador("Sara Smith", eq2);
+            Jugador jug3 = new Jugador("Juan Perez", eq3);
 
             // Asignamos los valores
             equiposArr[0] = eq1;
@@ -37,8 +32,6 @@ public class Application {
             jugadoresArr[0] = jug1;
             jugadoresArr[1] = jug2;
             jugadoresArr[2] = jug3;
-
-
 
             mainMenu();
         } catch (Exception e) {
@@ -122,31 +115,32 @@ public class Application {
     private static void crearJugador() {
         MenuUtility.header("Crear jugador");
 
+        if (Equipo.isEmpty()) {
+            System.out.println("Lo sentimos, debe tener equipos registrados para crear un jugador.");
+
+            // Pausar la ejecución del programa hasta que presione ENTER
+            ConsoleUtility.waitPressEnterKey(scanner);
+
+            return;
+        }
+
         // Solicitamos los datos
         String nombreJugador = MenuUtility.solicitarCadena(scanner, "Ingrese el nombre del jugador: ");
+
+        // Listamos los equipos registrados
+        System.out.println("\nEquipos disponibles:");
+        Equipo.printListEquipos(equiposArr, "");
+
+        // Solicitamos la selección del equipo a asignar
+        int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
 
         // Si ya hay registrado algún jugador debemos aumentar en 1 el tamaño del arreglo
         if (jugadoresArr[jugadoresArr.length - 1] != null) {
             jugadoresArr = Arrays.copyOf(jugadoresArr, jugadoresArr.length + 1);
         }
-
-        // Creamos la instancia del jugador
-        Jugador nuevoJugador = new Jugador(nombreJugador);
-
-        if (Equipo.isEmpty()) {
-            System.out.println("\nNo hay equipos disponibles. El jugador se creará sin equipo.");
-        } else {
-            System.out.println("\nEquipos disponibles:");
-            Equipo.printAllEquipos(equiposArr, "");
-            // Solicitamos la selección del equipo a asignar
-            int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente (0 para ninguno): ", 0, equiposArr.length);
-
-            if (indiceEquipo >= 1 && indiceEquipo <= equiposArr.length) {
-                nuevoJugador.setEquipo(equiposArr[indiceEquipo - 1]);
-            }
-        }
-
+        
         // Asignamos los valores
+        Jugador nuevoJugador = new Jugador(nombreJugador, equiposArr[indiceEquipo - 1]);
         jugadoresArr[jugadoresArr.length - 1] = nuevoJugador;
 
         System.out.println("\nJugador creado exitosamente.");
@@ -192,7 +186,7 @@ public class Application {
 
         System.out.println("\nLista de jugadores:");
 
-        Jugador.printAllJugadores(jugadoresArr, "");
+        Jugador.printListJugadores(jugadoresArr, "");
 
         // Solicitamos la selección del jugador a asignar
         int indiceJugador = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del jugador correspondiente: ", 1, jugadoresArr.length);
@@ -200,7 +194,7 @@ public class Application {
         
         System.out.println("\nLista de equipos:");
 
-        Equipo.printAllEquipos(equiposArr, "");
+        Equipo.printListEquipos(equiposArr, "");
 
         // Solicitamos la selección del equipo a asignar
         int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
@@ -243,8 +237,8 @@ public class Application {
         } else {
             System.out.println("\nLista de jugadores:");
 
-            Jugador.printAllJugadores(jugadoresArr, "");
-
+            Jugador.printListJugadores(jugadoresArr, "");
+            
             // Solicitamos la selección del jugador a asignar
             int indiceJugador = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del jugador correspondiente: ", 1, jugadoresArr.length);
 
@@ -274,7 +268,7 @@ public class Application {
         } else {
             System.out.println("\nLista de equipos:");
 
-            Equipo.printAllEquipos(equiposArr, "");
+            Equipo.printListEquipos(equiposArr, "");
 
             // Solicitamos la selección del equipo a asignar
             int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
@@ -288,8 +282,12 @@ public class Application {
             if (clearFilters == 'S') {
                 equiposArr = Equipo.eliminarEquipo(equiposArr, delEquipo);
 
-                // Eliminamos las relaciones del equipo con lo jugadores
-                Jugador.clearRelationshipWithEquipo(jugadoresArr, delEquipo);
+                // Eliminamos los jugadores relacionados al equipo
+                // Obtenemos un listado de los Ids de los jugadores asociados al equipo
+                Integer[] listIdsJugadores = Jugador.getIdsJugadoresRelatedToEquipo(jugadoresArr, delEquipo);
+                if (listIdsJugadores != null) {
+                    jugadoresArr = Jugador.eliminarJugador(jugadoresArr, listIdsJugadores);
+                }
 
                 System.out.println("\nEl equipo se eliminó exitosamente.");
             }
@@ -422,19 +420,24 @@ public class Application {
     private static void cambiarEquipo(int indice, Jugador jugador) {
         MenuUtility.header("Cambiar equipo del jugador "+ jugador.getNombre());
 
+        if (Equipo.isEmpty()) {
+            System.out.println("No hay equipos registrados.");
+
+            // Pausar la ejecución del programa hasta que presione ENTER
+            ConsoleUtility.waitPressEnterKey(scanner);
+
+            return;
+        }
+
         System.out.println("\nLista de equipos:");
 
         Equipo.printAllEquipos(equiposArr, "");
 
         // Solicitamos la selección del equipo a asignar
-        int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente (0 para ninguno): ", 0, equiposArr.length);
+        int indiceEquipo = MenuUtility.solicitaNumeroMenu(scanner, "\nIngrese el número del equipo correspondiente: ", 1, equiposArr.length);
 
         // Asignamos el equipo seleccionado al jugador seleccionado
-        if (indiceEquipo == 0) {
-            jugador.setEquipo(null);
-        } else {
-            jugador.setEquipo(equiposArr[indiceEquipo - 1]);
-        }
+        jugador.setEquipo(equiposArr[indiceEquipo - 1]);
 
         System.out.println("\nEl jugador se actualizó existosamente.");
 
@@ -513,6 +516,15 @@ public class Application {
 
     private static void agregarJugador(Equipo equipo) {
         MenuUtility.header("Agregar jugador al equipo "+ equipo.getNombre());
+
+        if (Jugador.isEmpty()) {
+            System.out.println("No hay jugadores registrados.");
+
+            // Pausar la ejecución del programa hasta que presione ENTER
+            ConsoleUtility.waitPressEnterKey(scanner);
+
+            return;
+        }
 
         System.out.println("\nLista de jugadores:");
 

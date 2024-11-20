@@ -184,14 +184,22 @@ public class Equipo {
     }
 
     public static Equipo[] eliminarEquipo(Equipo[] equiposArr, Equipo equipo) {
-        Equipo[] equiposUpArr = new Equipo[equiposArr.length - 1];
+        int newSize = equiposArr.length - 1;
+        if (newSize <= 0) {
+            newSize = 1;
+            // Reiniciamos el contador de instancias
+            cont = 0;
+        }
+        Equipo[] equiposUpArr = new Equipo[newSize];
         int index = 0;
-        for (Equipo itemEquipo : equiposArr) {
-            if (itemEquipo != equipo) {
-                equiposUpArr[index] = itemEquipo;
-                index++;
+        if (equiposArr != null && equiposArr[0] != null){
+            for (Equipo itemEquipo : equiposArr) {
+                if (itemEquipo != equipo) {
+                    equiposUpArr[index] = itemEquipo;
+                    index++;
+                }
+                
             }
-            
         }
         return equiposUpArr;
     }

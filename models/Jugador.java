@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Arrays;
+
 public class Jugador {
     private String nombre;
     private Equipo equipo;
@@ -16,8 +18,9 @@ public class Jugador {
 
     public Jugador(){}
 
-    public Jugador(String nombre) {
+    public Jugador(String nombre, Equipo equipo) {
         this.setNombre(nombre);
+        this.setEquipo(equipo);
         cont++;
         this.id = cont;
     }
@@ -255,41 +258,94 @@ public class Jugador {
     }
 
     public static Jugador[] eliminarJugador(Jugador[] jugadoresArr, Jugador jugador) {
-        Jugador[] jugadoresUpArr = new Jugador[jugadoresArr.length - 1];
+        int newSize = jugadoresArr.length - 1;
+        if (newSize <= 0) {
+            newSize = 1;
+            // Reiniciamos el contador de instancias
+            cont = 0;
+        }
+        Jugador[] jugadoresUpArr = new Jugador[newSize];
         int index = 0;
-        for (Jugador itemJugador : jugadoresArr) {
-            if (itemJugador != jugador) {
-                jugadoresUpArr[index] = itemJugador;
-                index++;
+        if (jugadoresArr != null && jugadoresArr[0] != null){
+            for (Jugador itemJugador : jugadoresArr) {
+                if (itemJugador != jugador) {
+                    jugadoresUpArr[index] = itemJugador;
+                    index++;
+                }
+                
             }
-            
         }
         return jugadoresUpArr;
     }
     
+    public static Jugador[] eliminarJugador(Jugador[] jugadoresArr, Integer[] listIds) {
+        int newSize = jugadoresArr.length - listIds.length;
+        if (newSize <= 0) {
+            newSize = 1;
+            // Reiniciamos el contador de instancias
+            cont = 0;
+        }
+        Jugador[] jugadoresUpArr = new Jugador[newSize];
+        int index = 0;
+        if (jugadoresArr != null && jugadoresArr[0] != null){
+            for (Jugador itemJugador : jugadoresArr) {
+                if (!existId(listIds, itemJugador.getId())) {
+                    jugadoresUpArr[index] = itemJugador;
+                    index++;
+                }
+            }
+        }
+        return jugadoresUpArr;
+    }
+
+    private static boolean existId(Integer[] listIds, Integer idJugador) {
+        for (Integer id : listIds) {
+            if (id == idJugador) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public static int contarJugadoresByEquipo(Jugador[] jugadoresArr, Equipo equipo) {
         int totalJugadores = 0;
-        for (Jugador itemJugador : jugadoresArr) {
-            if (itemJugador.getEquipo() == equipo) {
-                totalJugadores++;
+        if (jugadoresArr != null && jugadoresArr[0] != null){
+            for (Jugador itemJugador : jugadoresArr) {
+                if (itemJugador.getEquipo() == equipo) {
+                    totalJugadores++;
+                }
+                
             }
-            
         }
         return totalJugadores;
     }
 
-    public static void clearRelationshipWithEquipo(Jugador[] jugadoresArr, Equipo equipo) {
-        for (int i = 0; i < jugadoresArr.length; i++) {
-            if (jugadoresArr[i].getEquipo() == equipo) {
-                jugadoresArr[i].setEquipo(null);
+    public static Integer[] getIdsJugadoresRelatedToEquipo(Jugador[] jugadoresArr, Equipo equipo) {
+        Integer[] listJugadoresArr = new Integer[1];
+        int i = 0;
+        if (jugadoresArr != null && jugadoresArr[0] != null){
+            for (Jugador jugador : jugadoresArr) {
+                if (jugador.getEquipo() == equipo) {
+                    // Si ya hay registrado algún id debemos aumentar en 1 el tamaño del arreglo
+                    if (listJugadoresArr[listJugadoresArr.length - 1] != null) {
+                        listJugadoresArr = Arrays.copyOf(listJugadoresArr, listJugadoresArr.length + 1);
+                    }
+                    // Asignamos el id
+                    listJugadoresArr[i] =  jugador.getId();
+                    i++;
+                }
             }
         }
+
+        return listJugadoresArr[0] == null ? null : listJugadoresArr;
     }
     
     public static void updateRelationshipWithEquipo(Jugador[] jugadoresArr, int idEquipo, Equipo upEquipo) {
-        for (int i = 0; i < jugadoresArr.length; i++) {
-            if (jugadoresArr[i].getEquipo().getId() == idEquipo) {
-                jugadoresArr[i].setEquipo(upEquipo);
+        if (jugadoresArr != null && jugadoresArr[0] != null){
+            for (int i = 0; i < jugadoresArr.length; i++) {
+                if (jugadoresArr[i].getEquipo().getId() == idEquipo) {
+                    jugadoresArr[i].setEquipo(upEquipo);
+                }
             }
         }
     }
